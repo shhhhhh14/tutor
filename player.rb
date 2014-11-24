@@ -32,7 +32,7 @@ class Player
 
     print "What is #{question}? "
     answer = gets.chomp.to_i
-    question.get_answer answer
+    question.get_answer # the get answer method doesn't take an argument, that's why that won't work
     @questions.add_question question
     question
   end
