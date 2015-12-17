@@ -1,0 +1,71 @@
+# -*- coding: UTF-8 -*-
+__author__ = 'Shauna'
+
+import os
+import nltk
+import ftfy
+from nltk.corpus import stopwords
+
+folder = "C:\\Users\\Shauna\\Documents\\College\\4.1\\FYP\\stopwords removed\\CSP Essays 2010"
+
+def get_files(folder_name):
+    for subdir, dirs, files in os.walk(folder_name):
+        for file in files:
+            yield os.path.join(subdir, file)
+
+def remove_stopwords(text):
+    print("removing stopwords..")
+    words = nltk.word_tokenize(text)
+
+    # possible custom list here if needed
+    filtered = [word for word in words if word not in stopwords.words('english')]
+
+    return filtered
+
+def strip_unicode(text):
+    unicode_clean = ftfy.fix_text(ftfy.fix_encoding(text))
+    try:
+        temp = unicode_clean.decode('utf-8', 'ignore').encode('utf-8')#encodes all possible chars in unicode
+    except UnicodeEncodeError or UnicodeEncodeError as e:
+        # print "ERROR ONE"
+        pass
+    try:
+        # print "first encoding failed. new method attempt"
+        temp = unicode_clean.encode('utf-8').decode('utf-8', 'ignore').encode('utf-8')
+    except UnicodeEncodeError or UnicodeDecodeError as e:
+        # print "ERROR TWO"
+        pass
+    return temp
+
+
+def clean_up_text(text):
+    one = strip_unicode(text)
+    two = remove_stopwords(one)
+    return two
+
+
+def replace_file_contents(file_path, text):
+    file = open(file_path, "w").close()
+    file = open(file_path, "a")
+
+    for word in text:
+        file.write(word)
+        file.write("\n")
+    print("file overwritten")
+
+
+
+if __name__ == "__main__":
+    for f in get_files(folder):
+        print(f)
+        if not f.endswith("DS_Store"):
+            file = open(f, "r+b")
+            text = file.read()
+            file.close()
+            print text
+            clean = strip_unicode(text)
+            uni_text = unicode(text, "utf-8")
+            new_text = remove_stopwords(clean)
+            # new_text = clean_up_text(text)
+            replace_file_contents(f, new_text)
+            # save this to the file we just opened
